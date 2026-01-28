@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <title>Devin</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+      .wrap {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 28px 18px 40px;
+      }
+      h1 {
+        font-size: 26px;
+        margin: 0 0 6px;
+      }
+      p {
+        margin: 0 0 18px;
+        opacity: 0.85;
+      }
+      .btns {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      a.btn, button.btn {
+        appearance: none;
+        border: 1px solid rgba(127,127,127,.35);
+        background: transparent;
+        border-radius: 14px;
+        padding: 14px 14px;
+        font-size: 16px;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .small {
+        font-size: 13px;
+        opacity: 0.7;
+        margin-top: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Devin Ergler</h1>
+      <p>Tap a button to connect.</p>
+
+      <div class="btns">
+        <button class="btn" id="addContactBtn" type="button">Add to Contacts</button>
+        <a class="btn" id="callBtn" href="#">Call</a>
+        <a class="btn" id="textBtn" href="#">Text</a>
+        <a class="btn" id="emailBtn" href="#">Email</a>
+        <a class="btn" id="igBtn" href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+
+      <div class="small">
+        This page is intentionally not indexed by search engines.
+      </div>
+    </div>
+
+    <script>
+      // Assemble contact info client-side (light obfuscation; not true security)
+      const phoneDigits = ["425","268","0714"].join("");
+      const phoneE164 = "+1" + phoneDigits;
+
+      const email = ["devin","ergler.com"].join("@");
+      const instagram = "https://instagram.com/dergle";
+
+      // Wire up links
+      const callBtn = document.getElementById("callBtn");
+      callBtn.href = "tel:" + phoneE164;
+      callBtn.textContent = "Call " + formatUS(phoneDigits);
+
+      const textBtn = document.getElementById("textBtn");
+      textBtn.href = "sms:" + phoneE164;
+      textBtn.textContent = "Text " + formatUS(phoneDigits);
+
+      const emailBtn = document.getElementById("emailBtn");
+      emailBtn.href = "mailto:" + email;
+      emailBtn.textContent = "Email " + email;
+
+      const igBtn = document.getElementById("igBtn");
+      igBtn.href = instagram;
+
+      // Build vCard in-browser (no public .vcf URL)
+      document.getElementById("addContactBtn").addEventListener("click", () => {
+        const vcard = [
+          "BEGIN:VCARD",
+          "VERSION:3.0",
+          "N:Ergler;Devin;;;",
+          "FN:Devin Ergler",
+          "TEL;TYPE=CELL:" + phoneE164,
+          "EMAIL;TYPE=INTERNET:" + email,
+          "URL:" + instagram,
+          "END:VCARD"
+        ].join("\r\n");
+
+        const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Devin-Ergler.vcf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      });
+
+      function formatUS(d) {
+        return "(" + d.slice(0,3) + ") " + d.slice(3,6) + "-" + d.slice(6);
+      }
+    </script>
+  </body>
+</html>
