@@ -324,11 +324,22 @@
       wire("personalIgBtn", personalInstagram);
       wire("businessIgBtn", businessInstagram);
       wire("cascadianBtn", cascadianSite);
-
+      
+      // ---- vCard URL label helper (Apple: avoids "homepage" spam) ----
+      function vcardUrlItems(pairs, startIndex = 1) {
+        // pairs: [{label, url}, ...]
+        const out = [];
+        pairs.forEach((p, i) => {
+          const n = startIndex + i;
+          out.push(`item${n}.URL:${p.url}`);
+          out.push(`item${n}.X-ABLabel:${p.label}`);
+        });
+        return out;
+      }
+      
       // ---- vCards ----
-      // Work: business-first, includes business socials.
       document.getElementById("addWorkContactBtn").addEventListener("click", () => {
-        const vcard = [
+        const lines = [
           "BEGIN:VCARD",
           "VERSION:3.0",
           "N:Ergler;Devin;;;",
@@ -336,35 +347,42 @@
           "ORG:Cascadian Water",
           "TEL;TYPE=WORK,VOICE:" + workPhone,
           "EMAIL;TYPE=WORK,INTERNET:" + workEmail,
+          // Optional: keep one plain URL for Android's "main website"
           "URL:" + cascadianSite,
-          "URL:" + linkedin,
-          "URL:" + businessFacebook,
-          "URL:" + businessInstagram,
+          ...vcardUrlItems([
+            { label: "Company Website", url: cascadianSite },
+            { label: "LinkedIn", url: linkedin },
+            { label: "Facebook", url: businessFacebook },
+            { label: "Instagram", url: businessInstagram }
+          ], 1),
           "END:VCARD"
-        ].join("\r\n");
-        downloadVCard(vcard, "Devin-Ergler-Work.vcf");
+        ];
+        downloadVCard(lines.join("\r\n"), "Devin-Ergler-Work.vcf");
       });
 
-      // Personal: includes all personal socials + ergler.com + Urbit + X.
       document.getElementById("addPersonalContactBtn").addEventListener("click", () => {
-        const vcard = [
+        const lines = [
           "BEGIN:VCARD",
           "VERSION:3.0",
           "N:Ergler;Devin;;;",
           "FN:Devin Ergler",
           "TEL;TYPE=CELL,VOICE:" + personalPhone,
           "EMAIL;TYPE=HOME,INTERNET:" + personalEmail,
+          // Optional: keep one plain URL for Android's "main website"
           "URL:" + erglerSite,
-          "URL:" + x,
-          "URL:" + linkedin,
-          "URL:" + personalFacebook,
-          "URL:" + personalInstagram,
-          "URL:" + medium,
-          "URL:" + kaggle,
-          "URL:" + urbit,
+          ...vcardUrlItems([
+            { label: "Personal Site", url: erglerSite },
+            { label: "X", url: x },
+            { label: "LinkedIn", url: linkedin },
+            { label: "Facebook", url: personalFacebook },
+            { label: "Instagram", url: personalInstagram },
+            { label: "Medium", url: medium },
+            { label: "Kaggle", url: kaggle },
+            { label: "Urbit", url: urbit }
+          ], 1),
           "END:VCARD"
-        ].join("\r\n");
-        downloadVCard(vcard, "Devin-Ergler-Personal.vcf");
+        ];
+        downloadVCard(lines.join("\r\n"), "Devin-Ergler-Personal.vcf");
       });
 
       // ---- Helpers ----
