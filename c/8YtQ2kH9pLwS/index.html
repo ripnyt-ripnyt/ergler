@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
-    <title>Devin</title>
+    <title>Devin Ergler</title>
     <style>
       :root { color-scheme: light dark; }
       body {
@@ -12,23 +12,20 @@
         margin: 0;
       }
       .wrap {
-        max-width: 520px;
+        max-width: 560px;
         margin: 0 auto;
         padding: 28px 18px 40px;
       }
-      h1 {
-        font-size: 26px;
-        margin: 0 0 6px;
-      }
-      p {
-        margin: 0 0 18px;
-        opacity: 0.85;
-      }
+      h1 { font-size: 26px; margin: 0 0 6px; }
+      h2 { font-size: 18px; margin: 26px 0 10px; opacity: .9; }
+      p { margin: 0 0 18px; opacity: 0.85; }
+
       .btns {
         display: grid;
         gap: 12px;
-        margin-top: 16px;
+        margin-top: 12px;
       }
+
       a.btn, button.btn {
         appearance: none;
         border: 1px solid rgba(127,127,127,.35);
@@ -40,24 +37,44 @@
         text-decoration: none;
         cursor: pointer;
       }
+
       .small {
         font-size: 13px;
         opacity: 0.7;
-        margin-top: 18px;
+        margin-top: 22px;
       }
     </style>
   </head>
   <body>
     <div class="wrap">
       <h1>Devin Ergler</h1>
-      <p>Tap a button to connect.</p>
+      <p>Choose how you’d like to connect.</p>
 
+      <!-- vCards -->
       <div class="btns">
-        <button class="btn" id="addContactBtn" type="button">Add to Contacts</button>
-        <a class="btn" id="callBtn" href="#">Call</a>
-        <a class="btn" id="textBtn" href="#">Text</a>
-        <a class="btn" id="emailBtn" href="#">Email</a>
-        <a class="btn" id="igBtn" href="#" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <button class="btn" id="addWorkContactBtn">Add Work Contact</button>
+        <button class="btn" id="addPersonalContactBtn">Add Personal Contact</button>
+      </div>
+
+      <!-- Direct contact -->
+      <h2>Direct</h2>
+      <div class="btns">
+        <a class="btn" id="workCallBtn" href="#">Call (Work)</a>
+        <a class="btn" id="personalCallBtn" href="#">Call (Personal)</a>
+        <a class="btn" id="personalTextBtn" href="#">Text (Personal)</a>
+        <a class="btn" id="workEmailBtn" href="#">Email (Work)</a>
+        <a class="btn" id="personalEmailBtn" href="#">Email (Personal)</a>
+      </div>
+
+      <!-- Social -->
+      <h2>Social & Web</h2>
+      <div class="btns">
+        <a class="btn" id="linkedinBtn" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a class="btn" id="personalFbBtn" target="_blank" rel="noopener noreferrer">Facebook (Personal)</a>
+        <a class="btn" id="businessFbBtn" target="_blank" rel="noopener noreferrer">Facebook (Cascadian Water)</a>
+        <a class="btn" id="personalIgBtn" target="_blank" rel="noopener noreferrer">Instagram (Personal)</a>
+        <a class="btn" id="businessIgBtn" target="_blank" rel="noopener noreferrer">Instagram (Cascadian Water)</a>
+        <a class="btn" id="websiteBtn" target="_blank" rel="noopener noreferrer">CascadianWater.com</a>
       </div>
 
       <div class="small">
@@ -66,56 +83,85 @@
     </div>
 
     <script>
-      // Assemble contact info client-side (light obfuscation; not true security)
-      const phoneDigits = ["425","268","0714"].join("");
-      const phoneE164 = "+1" + phoneDigits;
+      // ---- Contact data (assembled client-side) ----
+      const workPhone = "+15096744004";
+      const personalPhone = "+14252680714";
 
-      const email = ["devin","ergler.com"].join("@");
-      const instagram = "https://instagram.com/dergle";
+      const workEmail = "dergler@gmail.com";
+      const personalEmail = "devin@ergler.com";
 
-      // Wire up links
-      const callBtn = document.getElementById("callBtn");
-      callBtn.href = "tel:" + phoneE164;
-      callBtn.textContent = "Call " + formatUS(phoneDigits);
+      const linkedin = "https://www.linkedin.com/in/devin-ergler-pe-b172072a3/";
+      const personalFacebook = "https://www.facebook.com/profile.php?id=100091478657273";
+      const businessFacebook = "https://www.facebook.com/Cascadianwater";
+      const personalInstagram = "https://www.instagram.com/dergle";
+      const businessInstagram = "https://www.instagram.com/cascadianwater";
+      const website = "https://cascadianwater.com";
 
-      const textBtn = document.getElementById("textBtn");
-      textBtn.href = "sms:" + phoneE164;
-      textBtn.textContent = "Text " + formatUS(phoneDigits);
+      // ---- Wire direct actions ----
+      wire("workCallBtn", "tel:" + workPhone, "Call (Work) " + fmt(workPhone));
+      wire("personalCallBtn", "tel:" + personalPhone, "Call (Personal) " + fmt(personalPhone));
+      wire("personalTextBtn", "sms:" + personalPhone, "Text (Personal) " + fmt(personalPhone));
+      wire("workEmailBtn", "mailto:" + workEmail, "Email (Work) " + workEmail);
+      wire("personalEmailBtn", "mailto:" + personalEmail, "Email (Personal) " + personalEmail);
 
-      const emailBtn = document.getElementById("emailBtn");
-      emailBtn.href = "mailto:" + email;
-      emailBtn.textContent = "Email " + email;
+      wire("linkedinBtn", linkedin);
+      wire("personalFbBtn", personalFacebook);
+      wire("businessFbBtn", businessFacebook);
+      wire("personalIgBtn", personalInstagram);
+      wire("businessIgBtn", businessInstagram);
+      wire("websiteBtn", website);
 
-      const igBtn = document.getElementById("igBtn");
-      igBtn.href = instagram;
-
-      // Build vCard in-browser (no public .vcf URL)
-      document.getElementById("addContactBtn").addEventListener("click", () => {
+      // ---- vCards ----
+      document.getElementById("addWorkContactBtn").addEventListener("click", () => {
         const vcard = [
           "BEGIN:VCARD",
           "VERSION:3.0",
           "N:Ergler;Devin;;;",
           "FN:Devin Ergler",
-          "TEL;TYPE=CELL:" + phoneE164,
-          "EMAIL;TYPE=INTERNET:" + email,
-          "URL:" + instagram,
+          "ORG:Cascadian Water",
+          "TEL;TYPE=WORK,VOICE:" + workPhone,
+          "EMAIL;TYPE=WORK,INTERNET:" + workEmail,
+          "URL:" + website,
           "END:VCARD"
         ].join("\r\n");
+        downloadVCard(vcard, "Devin-Ergler-Work.vcf");
+      });
 
-        const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
+      document.getElementById("addPersonalContactBtn").addEventListener("click", () => {
+        const vcard = [
+          "BEGIN:VCARD",
+          "VERSION:3.0",
+          "N:Ergler;Devin;;;",
+          "FN:Devin Ergler",
+          "TEL;TYPE=CELL,VOICE:" + personalPhone,
+          "EMAIL;TYPE=HOME,INTERNET:" + personalEmail,
+          "URL:" + personalInstagram,
+          "END:VCARD"
+        ].join("\r\n");
+        downloadVCard(vcard, "Devin-Ergler-Personal.vcf");
+      });
+
+      // ---- Helpers ----
+      function wire(id, href, label) {
+        const el = document.getElementById(id);
+        el.href = href;
+        if (label) el.textContent = label;
+      }
+
+      function downloadVCard(text, filename) {
+        const blob = new Blob([text], { type: "text/vcard;charset=utf-8" });
         const url = URL.createObjectURL(blob);
-
         const a = document.createElement("a");
         a.href = url;
-        a.download = "Devin-Ergler.vcf";
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         a.remove();
-
         setTimeout(() => URL.revokeObjectURL(url), 3000);
-      });
+      }
 
-      function formatUS(d) {
+      function fmt(e164) {
+        const d = e164.replace("+1","");
         return "(" + d.slice(0,3) + ") " + d.slice(3,6) + "-" + d.slice(6);
       }
     </script>
