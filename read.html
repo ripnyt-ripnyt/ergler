@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Reading</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="article.css">
+</head>
+<body>
+  <nav><a href="index.html">← back</a></nav>
+  <article id="content">Loading…</article>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const ALLOWED = [
+      'Cannabis Research is the Field that DeSci can grow in.md',
+      'Decentralized science is too narrow.md',
+      'Homesteading Mars.md',
+      'Separating science from the cathedral.md'
+    ];
+    const params = new URLSearchParams(location.search);
+    const doc = params.get('doc');
+    if (!doc || !ALLOWED.includes(doc)) {
+      document.getElementById('content').innerHTML = '<p>Unknown or missing document.</p>';
+      document.title = 'Not found';
+    } else {
+      fetch(doc)
+        .then(r => r.ok ? r.text() : Promise.reject(new Error('Not found')))
+        .then(md => {
+          document.getElementById('content').innerHTML = marked.parse(md);
+          const h1 = document.querySelector('#content h1');
+          if (h1) document.title = h1.textContent;
+        })
+        .catch(() => {
+          document.getElementById('content').innerHTML = '<p>Could not load document.</p>';
+          document.title = 'Error';
+        });
+    }
+  </script>
+</body>
+</html>
