@@ -10,6 +10,7 @@
   <nav><a href="index.html">← back</a></nav>
   <article id="content">Loading…</article>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
   <script>
     const ALLOWED = [
       'Cannabis Research is the Field that DeSci can grow in.md',
@@ -23,10 +24,11 @@
       document.getElementById('content').innerHTML = '<p>Unknown or missing document.</p>';
       document.title = 'Not found';
     } else {
-      fetch(doc)
+      fetch(encodeURI(doc))
         .then(r => r.ok ? r.text() : Promise.reject(new Error('Not found')))
         .then(md => {
-          document.getElementById('content').innerHTML = marked.parse(md);
+          const raw = marked.parse(md);
+          document.getElementById('content').innerHTML = DOMPurify.sanitize(raw, { USE_PROFILES: { html: true } });
           const h1 = document.querySelector('#content h1');
           if (h1) document.title = h1.textContent;
         })
